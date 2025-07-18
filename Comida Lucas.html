@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Alimentación para Lucas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .calendar-day {
+            transition: all 0.2s ease-in-out;
+            position: relative;
+        }
+        .fed-complete {
+            background-color: #4ade80 !important; /* green-400 */
+            color: white;
+            border-radius: 50%;
+        }
+        .fed-partial {
+            background-color: #facc15 !important; /* yellow-400 */
+            color: white;
+            border-radius: 50%;
+        }
+        .today {
+            border: 2px solid #3b82f6; /* blue-500 */
+        }
+        .disabled-button {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .wet-food-icon {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 0.6rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="app-content" class="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-6 md:p-8">
+        
+        <!-- Header -->
+        <div class="text-center mb-6 border-b pb-4">
+            <h1 class="text-3xl font-bold text-gray-800">Plan de Alimentación de Lucas</h1>
+            <p class="text-lg text-gray-500" id="current-date">Cargando fecha...</p>
+            <div id="remaining-food-container" class="mt-4 text-xl font-semibold text-gray-700 bg-blue-100 border-l-4 border-blue-500 p-3 rounded-md">
+                Comida seca restante: <span id="remaining-food">Calculando...</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Feeding Schedule Section -->
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4 text-center">Comidas de Hoy</h2>
+                <div class="space-y-4">
+                    <!-- Morning Meal -->
+                    <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm">
+                        <div>
+                            <h3 class="font-bold text-lg text-blue-600">Desayuno ☀️</h3>
+                            <p class="text-gray-600">Hora programada: <span class="font-semibold">10:00 AM</span></p>
+                            <p class="text-gray-600">Porción: <span class="font-semibold">33.5g</span></p>
+                            <p id="morning-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
+                        </div>
+                        <button id="feed-morning" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors">
+                            Dar Comida
+                        </button>
+                    </div>
+                    <!-- Evening Meal -->
+                    <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm">
+                        <div>
+                            <h3 class="font-bold text-lg text-indigo-600">Cena 🌙</h3>
+                            <p class="text-gray-600">Hora programada: <span class="font-semibold">07:00 PM</span></p>
+                            <p class="text-gray-600">Porción: <span class="font-semibold">33.5g</span></p>
+                            <p id="evening-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
+                        </div>
+                        <button id="feed-evening" class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors">
+                            Dar Comida
+                        </button>
+                    </div>
+                    <!-- Wet Food -->
+                    <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm">
+                        <div>
+                            <h3 class="font-bold text-lg text-teal-600">Comida Húmeda 🐟</h3>
+                            <p class="text-gray-600">Extra / Snack</p>
+                            <p id="wet-food-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
+                        </div>
+                        <button id="feed-wet" class="px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-colors">
+                            Dar Snack
+                        </button>
+                    </div>
+                </div>
+                 <div class="mt-4 text-center text-sm text-gray-500">
+                    <p>Ración diaria total (seca): <strong>67g</strong></p>
+                </div>
+            </div>
+
+            <!-- Calendar Section -->
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <button id="prev-month" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&lt;</button>
+                    <h2 id="month-year" class="text-xl font-semibold text-gray-700"></h2>
+                    <button id="next-month" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">&gt;</button>
+                </div>
+                <div id="calendar" class="grid grid-cols-7 gap-1 text-center">
+                    <!-- Calendar will be generated here -->
+                </div>
+                <div class="mt-4 flex justify-center space-x-4 text-sm">
+                    <div class="flex items-center"><span class="w-4 h-4 rounded-full bg-green-400 mr-2"></span>Completo</div>
+                    <div class="flex items-center"><span class="w-4 h-4 rounded-full bg-yellow-400 mr-2"></span>Parcial</div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-1">🐟</span>Snack Húmedo</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- App State ---
+            let currentDate = new Date();
+            let allLogs = {};
+            const TOTAL_FOOD_GRAMS = 10000;
+            const PORTION_GRAMS = 33.5;
+            const STORAGE_KEY = 'lucasFeedingData';
+
+            // --- DOM Elements ---
+            const dateDisplay = document.getElementById('current-date');
+            const feedMorningBtn = document.getElementById('feed-morning');
+            const feedEveningBtn = document.getElementById('feed-evening');
+            const feedWetBtn = document.getElementById('feed-wet');
+            const morningFedTime = document.getElementById('morning-fed-time');
+            const eveningFedTime = document.getElementById('evening-fed-time');
+            const wetFoodFedTime = document.getElementById('wet-food-fed-time');
+            const remainingFoodEl = document.getElementById('remaining-food');
+            const calendarEl = document.getElementById('calendar');
+            const monthYearEl = document.getElementById('month-year');
+            const prevMonthBtn = document.getElementById('prev-month');
+            const nextMonthBtn = document.getElementById('next-month');
+
+            // --- Data Functions ---
+            function loadLogs() {
+                const data = localStorage.getItem(STORAGE_KEY);
+                allLogs = data ? JSON.parse(data) : {};
+            }
+
+            function saveLogs() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(allLogs));
+            }
+
+            // --- Main App Initialization ---
+            function main() {
+                loadLogs();
+                updateDateDisplay();
+                setupEventListeners();
+                renderAll();
+            }
+
+            function setupEventListeners() {
+                feedMorningBtn.addEventListener('click', () => logMeal('morning'));
+                feedEveningBtn.addEventListener('click', () => logMeal('evening'));
+                feedWetBtn.addEventListener('click', () => logMeal('wet_food'));
+                prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+                nextMonthBtn.addEventListener('click', () => changeMonth(1));
+            }
+
+            // --- UI Rendering ---
+            function renderAll() {
+                renderCalendar();
+                updateTodaysUI();
+                calculateAndDisplayRemainingFood();
+            }
+
+            function updateDateDisplay() {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateDisplay.textContent = new Date().toLocaleDateString('es-ES', options);
+            }
+
+            function updateTodaysUI() {
+                const todayKey = getStorageKey(new Date());
+                const data = allLogs[todayKey] || {};
+
+                // Reset UI state
+                [morningFedTime, eveningFedTime, wetFoodFedTime].forEach(el => el.textContent = '');
+                [feedMorningBtn, feedEveningBtn, feedWetBtn].forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('disabled-button');
+                    btn.textContent = btn.id === 'feed-wet' ? 'Dar Snack' : 'Dar Comida';
+                });
+
+                if (data.morning) {
+                    morningFedTime.textContent = `Alimentado a las: ${data.morning.time}`;
+                    feedMorningBtn.textContent = 'Hecho';
+                    feedMorningBtn.disabled = true;
+                    feedMorningBtn.classList.add('disabled-button');
+                }
+                if (data.evening) {
+                    eveningFedTime.textContent = `Alimentado a las: ${data.evening.time}`;
+                    feedEveningBtn.textContent = 'Hecho';
+                    feedEveningBtn.disabled = true;
+                    feedEveningBtn.classList.add('disabled-button');
+                }
+                if (data.wet_food) {
+                    wetFoodFedTime.textContent = `Snack dado a las: ${data.wet_food.time}`;
+                    feedWetBtn.textContent = 'Hecho';
+                    feedWetBtn.disabled = true;
+                    feedWetBtn.classList.add('disabled-button');
+                }
+            }
+
+            function renderCalendar() {
+                calendarEl.innerHTML = '';
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+
+                monthYearEl.textContent = new Date(year, month).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+
+                const daysOfWeek = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
+                daysOfWeek.forEach(day => {
+                    const dayEl = document.createElement('div');
+                    dayEl.className = 'font-bold text-gray-500 text-sm';
+                    dayEl.textContent = day;
+                    calendarEl.appendChild(dayEl);
+                });
+
+                const firstDayOfMonth = new Date(year, month, 1);
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const startDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7;
+
+                for (let i = 0; i < startDayOfWeek; i++) {
+                    calendarEl.appendChild(document.createElement('div'));
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayEl = document.createElement('div');
+                    const dayDate = new Date(year, month, day);
+                    const storageKey = getStorageKey(dayDate);
+                    const logData = allLogs[storageKey];
+
+                    dayEl.textContent = day;
+                    dayEl.className = 'calendar-day w-9 h-9 flex items-center justify-center rounded-full cursor-pointer hover:bg-gray-200';
+
+                    if (logData) {
+                        if (logData.morning && logData.evening) {
+                            dayEl.classList.add('fed-complete');
+                        } else if (logData.morning || logData.evening) {
+                            dayEl.classList.add('fed-partial');
+                        }
+                        if (logData.wet_food) {
+                            const icon = document.createElement('span');
+                            icon.className = 'wet-food-icon';
+                            icon.textContent = '🐟';
+                            dayEl.appendChild(icon);
+                        }
+                    }
+                    if (isToday(dayDate)) dayEl.classList.add('today');
+                    calendarEl.appendChild(dayEl);
+                }
+            }
+
+            function calculateAndDisplayRemainingFood() {
+                let totalConsumed = 0;
+                for (const key in allLogs) {
+                    const dayLog = allLogs[key];
+                    if (dayLog.morning) totalConsumed += PORTION_GRAMS;
+                    if (dayLog.evening) totalConsumed += PORTION_GRAMS;
+                }
+                const remaining = TOTAL_FOOD_GRAMS - totalConsumed;
+                remainingFoodEl.textContent = `${(remaining / 1000).toFixed(2)} kg`;
+            }
+
+            // --- Actions and Data Persistence ---
+            function logMeal(mealType) {
+                const now = new Date();
+                const todayKey = getStorageKey(now);
+                
+                const newLogEntry = { time: now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) };
+                
+                if (!allLogs[todayKey]) allLogs[todayKey] = {};
+                allLogs[todayKey][mealType] = newLogEntry;
+
+                saveLogs();
+                renderAll();
+            }
+
+            function changeMonth(offset) {
+                currentDate.setMonth(currentDate.getMonth() + offset);
+                renderCalendar();
+            }
+
+            // --- Helper Functions ---
+            function getStorageKey(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            
+            function isToday(date) {
+                const today = new Date();
+                return date.getDate() === today.getDate() &&
+                       date.getMonth() === today.getMonth() &&
+                       date.getFullYear() === today.getFullYear();
+            }
+
+            // --- Start the app ---
+            main();
+        });
+    </script>
+</body>
+</html>
