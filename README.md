@@ -1,4 +1,5 @@
 🐾 My-Cat-Food
+
 My-Cat-Food is an interactive web app designed to visually and conveniently manage your cat’s feeding schedule. It lets you track daily meals, portion sizes, and remaining food levels—all from a modern interface with theming, sound effects, and persistent local storage.
 
 🧾 Features
