@@ -61,6 +61,14 @@
             </svg>
         </button>
 
+        <!-- Profile Image Section -->
+        <div class="flex justify-center mb-4">
+            <label for="profile-image-upload" class="cursor-pointer">
+                <img id="profile-image" src="https://i.imgur.com/815cAGk.png" alt="Profile" class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md hover:opacity-90 transition-opacity">
+            </label>
+            <input type="file" id="profile-image-upload" class="hidden" accept="image/*">
+        </div>
+
         <!-- Header -->
         <div class="text-center mb-6 border-b pb-4 theme-card">
             <h1 id="main-title" class="text-3xl font-bold theme-text-primary">Plan de Alimentacion</h1>
@@ -77,34 +85,34 @@
                 <div class="space-y-4">
                     <!-- Morning Meal -->
                     <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm">
-                        <div>
+                        <div class="flex-grow">
                             <h3 id="title-morning" class="font-bold text-lg theme-title"></h3>
                             <p class="theme-text-secondary">Hora: <span id="display-morning-time" class="font-semibold"></span></p>
                             <p class="theme-text-secondary">Porción: <span id="display-portion" class="font-semibold"></span></p>
                             <p id="morning-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
                             <p id="morning-countdown" class="text-sm font-bold mt-1"></p>
                         </div>
-                        <button id="feed-morning" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors">Dar Comida</button>
+                        <button id="feed-morning" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap flex-shrink-0 ml-4">Dar Comida</button>
                     </div>
                     <!-- Evening Meal -->
                     <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm">
-                        <div>
+                        <div class="flex-grow">
                             <h3 id="title-evening" class="font-bold text-lg theme-title"></h3>
                             <p class="theme-text-secondary">Hora: <span id="display-evening-time" class="font-semibold"></span></p>
                             <p class="theme-text-secondary">Porción: <span id="display-portion-2" class="font-semibold"></span></p>
                             <p id="evening-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
                             <p id="evening-countdown" class="text-sm font-bold mt-1"></p>
                         </div>
-                        <button id="feed-evening" class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors">Dar Comida</button>
+                        <button id="feed-evening" class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors whitespace-nowrap flex-shrink-0 ml-4">Dar Comida</button>
                     </div>
                     <!-- Wet Food -->
                     <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm">
-                        <div>
+                        <div class="flex-grow">
                             <h3 id="title-wet" class="font-bold text-lg theme-title"></h3>
                             <p class="theme-text-secondary">Extra / Snack</p>
                             <p id="wet-food-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
                         </div>
-                        <button id="feed-wet" class="px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-colors">Dar Snack</button>
+                        <button id="feed-wet" class="px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-colors whitespace-nowrap flex-shrink-0 ml-4">Dar Snack</button>
                     </div>
                 </div>
             </div>
@@ -197,16 +205,21 @@
             let currentDate = new Date();
             let allLogs = {};
             let settings = {};
-            const LOGS_STORAGE_KEY = 'lucasFeedingLogs';
-            const SETTINGS_STORAGE_KEY = 'lucasFeedingSettings';
+            const LOGS_STORAGE_KEY = 'CatsFeedingLogs';
+            const SETTINGS_STORAGE_KEY = 'CatsFeedingSettings';
+
+            // --- UI State (Not Saved) ---
+            let confirmationState = { morning: false, evening: false, wet_food: false };
+            let confirmationTimeout = null;
 
             // --- Default Settings ---
             const defaultSettings = {
                 mainTitle: 'Plan de Alimentacion',
                 remainingFoodTitle: 'Comida seca restante: ',
+                profileImage: 'https://pets-society.com/wp-content/uploads/2023/02/orange-tabby-cat-ginger-847x1024.jpg',
                 titleMorning: 'Desayuno ☀️',
                 titleEvening: 'Cena 🌙',
-                titleWet: 'Comida Húmeda 🐟',
+                titleWet: 'Sobres 🐟',
                 morningTime: '10:00',
                 eveningTime: '19:00',
                 portionGrams: 33.5,
@@ -262,6 +275,8 @@
                 settingTotalKg: document.getElementById('setting-total-kg'),
                 themeSelector: document.getElementById('theme-selector'),
                 mainTitle: document.getElementById('main-title'),
+                profileImage: document.getElementById('profile-image'),
+                profileImageUpload: document.getElementById('profile-image-upload'),
                 titleMorning: document.getElementById('title-morning'),
                 titleEvening: document.getElementById('title-evening'),
                 titleWet: document.getElementById('title-wet'),
@@ -301,10 +316,10 @@
             }
 
             function setupEventListeners() {
-                const { feedMorningBtn, feedEveningBtn, feedWetBtn, prevMonthBtn, nextMonthBtn, settingsBtn, closeSettingsBtn, settingMorningTime, settingEveningTime, settingPortionGrams, settingTotalKg, settingMainTitle, settingRemainingFoodTitle, settingTitleMorning, settingTitleEvening, settingTitleWet, volumeSlider, muteBtn } = allDOMElements;
-                feedMorningBtn.addEventListener('click', () => logMeal('morning'));
-                feedEveningBtn.addEventListener('click', () => logMeal('evening'));
-                feedWetBtn.addEventListener('click', () => logMeal('wet_food'));
+                const { feedMorningBtn, feedEveningBtn, feedWetBtn, prevMonthBtn, nextMonthBtn, settingsBtn, closeSettingsBtn, settingMorningTime, settingEveningTime, settingPortionGrams, settingTotalKg, settingMainTitle, settingRemainingFoodTitle, settingTitleMorning, settingTitleEvening, settingTitleWet, volumeSlider, muteBtn, profileImageUpload } = allDOMElements;
+                feedMorningBtn.addEventListener('click', () => handleFeedClick('morning', feedMorningBtn));
+                feedEveningBtn.addEventListener('click', () => handleFeedClick('evening', feedEveningBtn));
+                feedWetBtn.addEventListener('click', () => handleFeedClick('wet_food', feedWetBtn));
                 prevMonthBtn.addEventListener('click', () => changeMonth(-1));
                 nextMonthBtn.addEventListener('click', () => changeMonth(1));
                 
@@ -320,6 +335,20 @@
                     allDOMElements.clickSound.volume = 0.15;
                     allDOMElements.clickSound.play();
                     allDOMElements.settingsPanel.classList.add('translate-x-full');
+                });
+
+                profileImageUpload.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const imageDataUrl = e.target.result;
+                            allDOMElements.profileImage.src = imageDataUrl;
+                            settings.profileImage = imageDataUrl;
+                            saveData();
+                        };
+                        reader.readAsDataURL(file);
+                    }
                 });
                 
                 // Settings Listeners
@@ -371,7 +400,7 @@
 
             // --- UI Rendering ---
             function applySettingsToUI() {
-                const { settingMorningTime, settingEveningTime, settingPortionGrams, settingTotalKg, displayMorningTime, displayEveningTime, displayPortion, displayPortion2, settingMainTitle, settingRemainingFoodTitle, settingTitleMorning, settingTitleEvening, settingTitleWet, mainTitle, remainingFoodLabel, titleMorning, titleEvening, titleWet } = allDOMElements;
+                const { settingMorningTime, settingEveningTime, settingPortionGrams, settingTotalKg, displayMorningTime, displayEveningTime, displayPortion, displayPortion2, settingMainTitle, settingRemainingFoodTitle, settingTitleMorning, settingTitleEvening, settingTitleWet, mainTitle, remainingFoodLabel, profileImage, titleMorning, titleEvening, titleWet } = allDOMElements;
                 settingMorningTime.value = settings.morningTime;
                 settingEveningTime.value = settings.eveningTime;
                 settingPortionGrams.value = settings.portionGrams;
@@ -384,6 +413,7 @@
 
                 mainTitle.innerHTML = settings.mainTitle;
                 remainingFoodLabel.innerHTML = settings.remainingFoodTitle;
+                profileImage.src = settings.profileImage;
                 titleMorning.innerHTML = settings.titleMorning;
                 titleEvening.innerHTML = settings.titleEvening;
                 titleWet.innerHTML = settings.titleWet;
@@ -413,14 +443,15 @@
                 const { morningFedTime, eveningFedTime, wetFoodFedTime, feedMorningBtn, feedEveningBtn, feedWetBtn } = allDOMElements;
                 const todayKey = getStorageKey(new Date());
                 const data = allLogs[todayKey] || {};
+                
+                resetAllConfirmations();
+
                 [morningFedTime, eveningFedTime, wetFoodFedTime].forEach(el => el.textContent = '');
                 [feedMorningBtn, feedEveningBtn, feedWetBtn].forEach(btn => {
                     btn.disabled = false;
                     btn.classList.remove('disabled-button');
                 });
-                feedMorningBtn.textContent = 'Dar Comida';
-                feedEveningBtn.textContent = 'Dar Comida';
-                feedWetBtn.textContent = 'Dar Snack';
+
                 if (data.morning) {
                     morningFedTime.textContent = `Alimentado a las: ${data.morning.time}`;
                     feedMorningBtn.textContent = 'Alimentado!';
@@ -465,13 +496,13 @@
                 if (logData && (logData.morning || logData.evening || logData.wet_food)) {
                     detailsHtml += '<div class="space-y-1 text-sm text-center">';
                     if (logData.morning) {
-                        detailsHtml += `<p class="${theme.textSecondary}">☀️ Desayuno: <span class="font-semibold ${theme.textPrimary}">${logData.morning.time} (${settings.portionGrams}g)</span></p>`;
+                        detailsHtml += `<p class="${theme.textSecondary}">${settings.titleMorning}: <span class="font-semibold ${theme.textPrimary}">${logData.morning.time} (${settings.portionGrams}g)</span></p>`;
                     }
                     if (logData.evening) {
-                        detailsHtml += `<p class="${theme.textSecondary}">🌙 Cena: <span class="font-semibold ${theme.textPrimary}">${logData.evening.time} (${settings.portionGrams}g)</span></p>`;
+                        detailsHtml += `<p class="${theme.textSecondary}">${settings.titleEvening}: <span class="font-semibold ${theme.textPrimary}">${logData.evening.time} (${settings.portionGrams}g)</span></p>`;
                     }
                     if (logData.wet_food) {
-                        detailsHtml += `<p class="${theme.textSecondary}">🐟 Snack: <span class="font-semibold ${theme.textPrimary}">${logData.wet_food.time}</span></p>`;
+                        detailsHtml += `<p class="${theme.textSecondary}">${settings.titleWet}: <span class="font-semibold ${theme.textPrimary}">${logData.wet_food.time}</span></p>`;
                     }
                     detailsHtml += '</div>';
                 } else {
@@ -651,6 +682,48 @@
             }
 
             // --- Actions and Data Persistence ---
+            function handleFeedClick(mealType, button) {
+                clearTimeout(confirmationTimeout);
+                
+                const otherMealTypes = ['morning', 'evening', 'wet_food'].filter(mt => mt !== mealType);
+                otherMealTypes.forEach(mt => {
+                    if (confirmationState[mt]) {
+                        confirmationState[mt] = false;
+                        let btn;
+                        if (mt === 'morning') btn = allDOMElements.feedMorningBtn;
+                        else if (mt === 'evening') btn = allDOMElements.feedEveningBtn;
+                        else if (mt === 'wet_food') btn = allDOMElements.feedWetBtn;
+                        
+                        if (btn && !btn.disabled) {
+                             btn.textContent = mt === 'wet_food' ? 'Dar Snack' : 'Dar Comida';
+                        }
+                    }
+                });
+
+                if (confirmationState[mealType]) {
+                    logMeal(mealType);
+                    confirmationState[mealType] = false;
+                } else {
+                    confirmationState[mealType] = true;
+                    button.textContent = '¿Estás seguro?';
+                    confirmationTimeout = setTimeout(() => {
+                        if (confirmationState[mealType]) {
+                            button.textContent = mealType === 'wet_food' ? 'Dar Snack' : 'Dar Comida';
+                            confirmationState[mealType] = false;
+                        }
+                    }, 3000);
+                }
+            }
+            
+            function resetAllConfirmations() {
+                clearTimeout(confirmationTimeout);
+                confirmationState = { morning: false, evening: false, wet_food: false };
+                const { feedMorningBtn, feedEveningBtn, feedWetBtn } = allDOMElements;
+                if (!feedMorningBtn.disabled) feedMorningBtn.textContent = 'Dar Comida';
+                if (!feedEveningBtn.disabled) feedEveningBtn.textContent = 'Dar Comida';
+                if (!feedWetBtn.disabled) feedWetBtn.textContent = 'Dar Snack';
+            }
+
             function logMeal(mealType) {
                 allDOMElements.clickSound.currentTime = 0;
                 allDOMElements.clickSound.volume = 0.15;
