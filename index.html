@@ -51,7 +51,7 @@
     <audio id="background-music" loop src="https://res.cloudinary.com/drwdtuzxy/video/upload/v1752885428/happy-relaxing-loop-275487_y9vfsg.mp3"></audio>
 
     <!-- Main App Content -->
-    <div id="app-content" class="w-full max-w-4xl mx-auto bg-white theme-card rounded-2xl shadow-lg p-6 md:p-8 relative">
+    <div id="app-content" class="w-full max-w-4xl mx-auto bg-white theme-card rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 relative">
         
         <!-- Settings Button -->
         <button id="settings-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 theme-text-secondary">
@@ -63,17 +63,17 @@
 
         <!-- Profile Image Section -->
         <div class="flex justify-center mb-4">
-            <label for="profile-image-upload" class="cursor-pointer">
-                <img id="profile-image" src="https://i.imgur.com/815cAGk.png" alt="Profile" class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md hover:opacity-90 transition-opacity">
+            <label for="profile-image-upload" id="profile-image-label" class="cursor-pointer">
+                <img id="profile-image" src="https://i.imgur.com/815cAGk.png" alt="Profile" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white shadow-md hover:opacity-90 transition-opacity" draggable="false">
             </label>
             <input type="file" id="profile-image-upload" class="hidden" accept="image/*">
         </div>
 
         <!-- Header -->
         <div class="text-center mb-6 border-b pb-4 theme-card">
-            <h1 id="main-title" class="text-3xl font-bold theme-text-primary">Plan de Alimentacion</h1>
-            <p class="text-lg theme-text-secondary" id="current-date">Cargando fecha...</p>
-            <div class="mt-4 text-xl font-semibold theme-highlight theme-text-primary border-l-4 p-3 rounded-md">
+            <h1 id="main-title" class="text-2xl sm:text-3xl font-bold theme-text-primary">Plan de Alimentacion</h1>
+            <p class="text-base sm:text-lg theme-text-secondary" id="current-date">Cargando fecha...</p>
+            <div class="mt-4 text-lg sm:text-xl font-semibold theme-highlight theme-text-primary border-l-4 p-3 rounded-md">
                 <span id="remaining-food-label">Comida seca restante: </span><span id="remaining-food">Calculando...</span>
             </div>
         </div>
@@ -81,11 +81,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Feeding Schedule Section -->
             <div class="bg-gray-50 theme-card p-6 rounded-lg">
-                <h2 class="text-2xl font-semibold theme-text-primary mb-4 text-center">Comidas de Hoy</h2>
+                <h2 class="text-xl sm:text-2xl font-semibold theme-text-primary mb-4 text-center">Comidas de Hoy</h2>
                 <div class="space-y-4">
                     <!-- Morning Meal -->
-                    <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm">
-                        <div class="flex-grow">
+                    <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm min-h-[7rem]">
+                        <div class="flex-grow min-w-0">
                             <h3 id="title-morning" class="font-bold text-lg theme-title"></h3>
                             <p class="theme-text-secondary">Hora: <span id="display-morning-time" class="font-semibold"></span></p>
                             <p class="theme-text-secondary">Porción: <span id="display-portion" class="font-semibold"></span></p>
@@ -95,8 +95,8 @@
                         <button id="feed-morning" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap flex-shrink-0 ml-4">Dar Comida</button>
                     </div>
                     <!-- Evening Meal -->
-                    <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm">
-                        <div class="flex-grow">
+                    <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm min-h-[7rem]">
+                        <div class="flex-grow min-w-0">
                             <h3 id="title-evening" class="font-bold text-lg theme-title"></h3>
                             <p class="theme-text-secondary">Hora: <span id="display-evening-time" class="font-semibold"></span></p>
                             <p class="theme-text-secondary">Porción: <span id="display-portion-2" class="font-semibold"></span></p>
@@ -106,8 +106,8 @@
                         <button id="feed-evening" class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors whitespace-nowrap flex-shrink-0 ml-4">Dar Comida</button>
                     </div>
                     <!-- Wet Food -->
-                    <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm">
-                        <div class="flex-grow">
+                    <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm min-h-[7rem]">
+                        <div class="flex-grow min-w-0">
                             <h3 id="title-wet" class="font-bold text-lg theme-title"></h3>
                             <p class="theme-text-secondary">Extra / Snack</p>
                             <p id="wet-food-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
@@ -276,6 +276,7 @@
                 themeSelector: document.getElementById('theme-selector'),
                 mainTitle: document.getElementById('main-title'),
                 profileImage: document.getElementById('profile-image'),
+                profileImageLabel: document.getElementById('profile-image-label'),
                 profileImageUpload: document.getElementById('profile-image-upload'),
                 titleMorning: document.getElementById('title-morning'),
                 titleEvening: document.getElementById('title-evening'),
@@ -316,7 +317,7 @@
             }
 
             function setupEventListeners() {
-                const { feedMorningBtn, feedEveningBtn, feedWetBtn, prevMonthBtn, nextMonthBtn, settingsBtn, closeSettingsBtn, settingMorningTime, settingEveningTime, settingPortionGrams, settingTotalKg, settingMainTitle, settingRemainingFoodTitle, settingTitleMorning, settingTitleEvening, settingTitleWet, volumeSlider, muteBtn, profileImageUpload } = allDOMElements;
+                const { feedMorningBtn, feedEveningBtn, feedWetBtn, prevMonthBtn, nextMonthBtn, settingsBtn, closeSettingsBtn, settingMorningTime, settingEveningTime, settingPortionGrams, settingTotalKg, settingMainTitle, settingRemainingFoodTitle, settingTitleMorning, settingTitleEvening, settingTitleWet, volumeSlider, muteBtn, profileImageUpload, profileImageLabel, profileImage } = allDOMElements;
                 feedMorningBtn.addEventListener('click', () => handleFeedClick('morning', feedMorningBtn));
                 feedEveningBtn.addEventListener('click', () => handleFeedClick('evening', feedEveningBtn));
                 feedWetBtn.addEventListener('click', () => handleFeedClick('wet_food', feedWetBtn));
@@ -336,6 +337,15 @@
                     allDOMElements.clickSound.play();
                     allDOMElements.settingsPanel.classList.add('translate-x-full');
                 });
+
+                profileImageLabel.addEventListener('click', () => {
+                    allDOMElements.clickSound.currentTime = 0;
+                    allDOMElements.clickSound.volume = 0.15;
+                    allDOMElements.clickSound.play();
+                });
+
+                profileImage.addEventListener('contextmenu', (e) => e.preventDefault());
+                profileImage.addEventListener('dragstart', (e) => e.preventDefault());
 
                 profileImageUpload.addEventListener('change', (event) => {
                     const file = event.target.files[0];
@@ -453,19 +463,19 @@
                 });
 
                 if (data.morning) {
-                    morningFedTime.textContent = `Alimentado a las: ${data.morning.time}`;
+                    morningFedTime.textContent = `Comió a las: ${data.morning.time}`;
                     feedMorningBtn.textContent = 'Alimentado!';
                     feedMorningBtn.disabled = true;
                     feedMorningBtn.classList.add('disabled-button');
                 }
                 if (data.evening) {
-                    eveningFedTime.textContent = `Alimentado a las: ${data.evening.time}`;
+                    eveningFedTime.textContent = `Comió a las: ${data.evening.time}`;
                     feedEveningBtn.textContent = 'Alimentado!';
                     feedEveningBtn.disabled = true;
                     feedEveningBtn.classList.add('disabled-button');
                 }
                 if (data.wet_food) {
-                    wetFoodFedTime.textContent = `Snack dado a las: ${data.wet_food.time}`;
+                    wetFoodFedTime.textContent = `Comió a las: ${data.wet_food.time}`;
                     feedWetBtn.textContent = 'Alimentado!';
                     feedWetBtn.disabled = true;
                     feedWetBtn.classList.add('disabled-button');
@@ -683,6 +693,10 @@
 
             // --- Actions and Data Persistence ---
             function handleFeedClick(mealType, button) {
+                allDOMElements.clickSound.currentTime = 0;
+                allDOMElements.clickSound.volume = 0.15;
+                allDOMElements.clickSound.play();
+                
                 clearTimeout(confirmationTimeout);
                 
                 const otherMealTypes = ['morning', 'evening', 'wet_food'].filter(mt => mt !== mealType);
@@ -725,10 +739,6 @@
             }
 
             function logMeal(mealType) {
-                allDOMElements.clickSound.currentTime = 0;
-                allDOMElements.clickSound.volume = 0.15;
-                allDOMElements.clickSound.play();
-
                 const now = new Date();
                 const todayKey = getStorageKey(now);
                 const newLogEntry = { time: now.toLocaleTimeString('es-ES', { hour: 'numeric', minute: '2-digit', hour12: true }) };
