@@ -63,9 +63,9 @@
 
         <!-- Profile Image Section -->
         <div class="flex justify-center mb-4">
-            <label for="profile-image-upload" id="profile-image-label" class="cursor-pointer">
+            <button id="profile-image-button" class="cursor-pointer focus:outline-none">
                 <img id="profile-image" src="https://pets-society.com/wp-content/uploads/2023/02/orange-tabby-cat-ginger-847x1024.jpg" alt="Profile" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white shadow-md hover:opacity-90 transition-opacity" draggable="false">
-            </label>
+            </button>
             <input type="file" id="profile-image-upload" class="hidden" accept="image/*">
         </div>
 
@@ -84,35 +84,35 @@
                 <h2 class="text-xl sm:text-2xl font-semibold theme-text-primary mb-4 text-center">Comidas de Hoy</h2>
                 <div class="space-y-4">
                     <!-- Morning Meal -->
-                    <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm min-h-[7rem]">
-                        <div class="flex-grow min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white theme-card rounded-lg shadow-sm">
+                        <div class="flex-grow min-w-0 w-full mb-2 sm:mb-0">
                             <h3 id="title-morning" class="font-bold text-lg theme-title"></h3>
                             <p class="theme-text-secondary">Hora: <span id="display-morning-time" class="font-semibold"></span></p>
                             <p class="theme-text-secondary">Porción: <span id="display-portion" class="font-semibold"></span></p>
                             <p id="morning-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
                             <p id="morning-countdown" class="text-sm font-bold mt-1"></p>
                         </div>
-                        <button id="feed-morning" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap flex-shrink-0 ml-4">Dar Comida</button>
+                        <button id="feed-morning" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors whitespace-nowrap flex-shrink-0 w-full sm:w-auto sm:ml-4">Dar Comida</button>
                     </div>
                     <!-- Evening Meal -->
-                    <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm min-h-[7rem]">
-                        <div class="flex-grow min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white theme-card rounded-lg shadow-sm">
+                        <div class="flex-grow min-w-0 w-full mb-2 sm:mb-0">
                             <h3 id="title-evening" class="font-bold text-lg theme-title"></h3>
                             <p class="theme-text-secondary">Hora: <span id="display-evening-time" class="font-semibold"></span></p>
                             <p class="theme-text-secondary">Porción: <span id="display-portion-2" class="font-semibold"></span></p>
                             <p id="evening-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
                             <p id="evening-countdown" class="text-sm font-bold mt-1"></p>
                         </div>
-                        <button id="feed-evening" class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors whitespace-nowrap flex-shrink-0 ml-4">Dar Comida</button>
+                        <button id="feed-evening" class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition-colors whitespace-nowrap flex-shrink-0 w-full sm:w-auto sm:ml-4">Dar Comida</button>
                     </div>
                     <!-- Wet Food -->
-                    <div class="flex items-center justify-between p-4 bg-white theme-card rounded-lg shadow-sm min-h-[7rem]">
-                        <div class="flex-grow min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white theme-card rounded-lg shadow-sm">
+                        <div class="flex-grow min-w-0 w-full mb-2 sm:mb-0">
                             <h3 id="title-wet" class="font-bold text-lg theme-title"></h3>
                             <p class="theme-text-secondary">Extra / Snack</p>
                             <p id="wet-food-fed-time" class="text-sm text-green-600 font-medium mt-1"></p>
                         </div>
-                        <button id="feed-wet" class="px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-colors whitespace-nowrap flex-shrink-0 ml-4">Dar Snack</button>
+                        <button id="feed-wet" class="px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-colors whitespace-nowrap flex-shrink-0 w-full sm:w-auto sm:ml-4">Dar Snack</button>
                     </div>
                 </div>
             </div>
@@ -198,6 +198,31 @@
         </div>
     </div>
 
+    <!-- Image Upload Modal -->
+    <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="theme-card p-6 rounded-lg shadow-lg w-full max-w-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold theme-text-primary">Cambiar Imagen de Perfil</h2>
+                <button id="close-image-modal" class="theme-text-secondary hover:text-gray-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="image-url-input" class="block text-sm font-medium theme-text-secondary">Pegar URL de la imagen</label>
+                    <div class="flex space-x-2 mt-1">
+                        <input type="text" id="image-url-input" class="w-full p-2 border rounded-md theme-input" placeholder="https://...">
+                        <button id="save-image-url" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600">Guardar</button>
+                    </div>
+                </div>
+                <div class="text-center theme-text-secondary">o</div>
+                <div>
+                     <button id="upload-image-button" class="w-full px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600">Subir desde el dispositivo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -205,6 +230,7 @@
             let currentDate = new Date();
             let allLogs = {};
             let settings = {};
+            let selectedDate = null;
             const LOGS_STORAGE_KEY = 'CatsFeedingLogs';
             const SETTINGS_STORAGE_KEY = 'CatsFeedingSettings';
 
@@ -276,8 +302,13 @@
                 themeSelector: document.getElementById('theme-selector'),
                 mainTitle: document.getElementById('main-title'),
                 profileImage: document.getElementById('profile-image'),
-                profileImageLabel: document.getElementById('profile-image-label'),
+                profileImageButton: document.getElementById('profile-image-button'),
                 profileImageUpload: document.getElementById('profile-image-upload'),
+                imageModal: document.getElementById('image-modal'),
+                closeImageModal: document.getElementById('close-image-modal'),
+                imageUrlInput: document.getElementById('image-url-input'),
+                saveImageUrl: document.getElementById('save-image-url'),
+                uploadImageButton: document.getElementById('upload-image-button'),
                 titleMorning: document.getElementById('title-morning'),
                 titleEvening: document.getElementById('title-evening'),
                 titleWet: document.getElementById('title-wet'),
@@ -317,7 +348,7 @@
             }
 
             function setupEventListeners() {
-                const { feedMorningBtn, feedEveningBtn, feedWetBtn, prevMonthBtn, nextMonthBtn, settingsBtn, closeSettingsBtn, settingMorningTime, settingEveningTime, settingPortionGrams, settingTotalKg, settingMainTitle, settingRemainingFoodTitle, settingTitleMorning, settingTitleEvening, settingTitleWet, volumeSlider, muteBtn, profileImageUpload, profileImageLabel, profileImage } = allDOMElements;
+                const { feedMorningBtn, feedEveningBtn, feedWetBtn, prevMonthBtn, nextMonthBtn, settingsBtn, closeSettingsBtn, settingMorningTime, settingEveningTime, settingPortionGrams, settingTotalKg, settingMainTitle, settingRemainingFoodTitle, settingTitleMorning, settingTitleEvening, settingTitleWet, volumeSlider, muteBtn, profileImageUpload, profileImageButton, profileImage, imageModal, closeImageModal, saveImageUrl, uploadImageButton, imageUrlInput } = allDOMElements;
                 feedMorningBtn.addEventListener('click', () => handleFeedClick('morning', feedMorningBtn));
                 feedEveningBtn.addEventListener('click', () => handleFeedClick('evening', feedEveningBtn));
                 feedWetBtn.addEventListener('click', () => handleFeedClick('wet_food', feedWetBtn));
@@ -338,10 +369,27 @@
                     allDOMElements.settingsPanel.classList.add('translate-x-full');
                 });
 
-                profileImageLabel.addEventListener('click', () => {
+                // --- Profile Image Modal Logic ---
+                profileImageButton.addEventListener('click', () => {
                     allDOMElements.clickSound.currentTime = 0;
                     allDOMElements.clickSound.volume = 0.15;
                     allDOMElements.clickSound.play();
+                    imageModal.classList.remove('hidden');
+                });
+
+                closeImageModal.addEventListener('click', () => imageModal.classList.add('hidden'));
+                
+                uploadImageButton.addEventListener('click', () => profileImageUpload.click());
+
+                saveImageUrl.addEventListener('click', () => {
+                    const newUrl = imageUrlInput.value.trim();
+                    if (newUrl) {
+                        profileImage.src = newUrl;
+                        settings.profileImage = newUrl;
+                        saveData();
+                        imageModal.classList.add('hidden');
+                        imageUrlInput.value = '';
+                    }
                 });
 
                 profileImage.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -353,9 +401,10 @@
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             const imageDataUrl = e.target.result;
-                            allDOMElements.profileImage.src = imageDataUrl;
+                            profileImage.src = imageDataUrl;
                             settings.profileImage = imageDataUrl;
                             saveData();
+                            imageModal.classList.add('hidden');
                         };
                         reader.readAsDataURL(file);
                     }
@@ -496,10 +545,12 @@
                 if (previouslySelected === element) {
                     calendarDetails.classList.add('hidden');
                     calendarDetails.innerHTML = '';
+                    selectedDate = null;
                     return; 
                 }
                 
                 element.classList.add('selected-day');
+                selectedDate = date;
 
                 let detailsHtml = `<h3 class="font-bold mb-2 text-center ${theme.textPrimary}">${date.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}</h3>`;
                 
@@ -676,6 +727,13 @@
                 cleanAndApply('.theme-title', `${theme.titleMorning} ${theme.titleEvening} ${theme.titleWet}`);
                 cleanAndApply('.theme-input', `${theme.card} ${theme.textPrimary} ${theme.border}`);
                 updateCountdowns();
+                
+                if (selectedDate) {
+                    const selectedElement = document.querySelector('.selected-day');
+                    if (selectedElement) {
+                        showDayDetails(selectedDate, selectedElement);
+                    }
+                }
             }
             
             function applyAudioSettings() {
@@ -752,6 +810,7 @@
                 currentDate.setMonth(currentDate.getMonth() + offset);
                 allDOMElements.calendarDetails.classList.add('hidden');
                 allDOMElements.calendarDetails.innerHTML = '';
+                selectedDate = null;
                 renderCalendar(); 
             }
 
